@@ -34,10 +34,16 @@ namespace OnBaseTool.Tools
         {
             ClickOnceInstaller clicker = new ClickOnceInstaller();
             clicker.Install();
-            //LoadAppManifest();
+        }
+
+        public static void OutlookAddinInstall()
+        {
+            Plugins plug = new Plugins();
+            plug.OutlookAddin();
         }
 
 
+        #region Function Codes
         private static void WaitForUI()
         {
             if (!noUninstaller)
@@ -59,7 +65,6 @@ namespace OnBaseTool.Tools
                 }
             }
         }
-
         private static void KillIfRunning()
         {
             ProcessHelper unitCheck = new ProcessHelper();
@@ -82,7 +87,6 @@ namespace OnBaseTool.Tools
                 procHelp.KillOnBase();
             }
         }
-
         private static void StartUninstall()
         {
             try
@@ -99,7 +103,6 @@ namespace OnBaseTool.Tools
                 noUninstaller = true;
             }
         }
-
         private static void SendConfirmationKeys()
         {
             const int WM_SYSKEYDOWN = 0x0104;
@@ -116,7 +119,6 @@ namespace OnBaseTool.Tools
             }
 
         }
-
         private static string UninstallString()
         {
             var key = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Uninstall");
@@ -139,6 +141,6 @@ namespace OnBaseTool.Tools
 
             return null;
         }
-
+        #endregion
     }
 }
