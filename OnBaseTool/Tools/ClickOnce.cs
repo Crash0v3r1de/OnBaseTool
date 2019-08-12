@@ -62,6 +62,12 @@ namespace OnBaseTool.Tools
 
         private static void KillIfRunning()
         {
+            ProcessHelper unitCheck = new ProcessHelper();
+            if (unitCheck.OnBaseRunning())
+            {
+                unitCheck.KillOnBase();
+            }
+
             var finder = Process.GetProcessesByName("dfsvc");
             if (finder.Length != 0)
             {

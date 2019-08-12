@@ -26,6 +26,7 @@ namespace OnBaseTool
 
         private void button1_Click(object sender, EventArgs e)
         {
+            
             ClickOnce.UnitySimpleUninstall();
             ClickOnce.UnityInstall();
         }
