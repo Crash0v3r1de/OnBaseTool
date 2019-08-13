@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using OnBaseTool.Enums;
+using OnBaseTool.Properties;
 
 namespace OnBaseTool.Tools
 {
@@ -14,102 +16,101 @@ namespace OnBaseTool.Tools
     {
         [DllImport("user32.dll")]
         private static extern bool PostMessage(IntPtr hWnd, uint Msg, int wParam, int lParam);
+        [DllImport("user32.dll")]
+        static extern IntPtr SendMessage(IntPtr hWnd, int Msg, int wParam, IntPtr lParam);
+        [DllImport("user32.dll")]
+        static extern IntPtr GetDlgItem(IntPtr hWnd, int nIDDlgItem);
+        [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+        static extern int GetWindowTextLength(IntPtr hWnd);
+        [DllImport("User32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+        static extern long GetWindowText(IntPtr hwnd, StringBuilder lpString, long cch);
+        [DllImport("User32.dll")]
+        static extern IntPtr GetParent(IntPtr hwnd);
+
+        private const int BUTTON_ID = 00081152;
+        private const int WM_COMMAND = 0x0111;
+        private const int BN_CLICKED = 0;
+        private const int WIN_HANDLE = 00081152;
 
         public void OutlookAddin()
         {
-            LoadAppManifest(AddinType.Outlook16);
-            WaitForUI();
-            SendConfirmationKeys();
-            WaitForCompletion();
+            if(CertMissing()) InstallCert();
+            Install(AddinType.Outlook16);
         }
 
-
-
-        private void LoadAppManifest(AddinType type)
+        public void ExcelAddin()
         {
-            string addin = "";
+            if (CertMissing()) InstallCert();
+            Install(AddinType.Excel16);
+        }
+
+        public void WordAddin()
+        {
+            if (CertMissing()) InstallCert();
+            Install(AddinType.Word16);
+        }
+
+        private int Install(AddinType type)
+        {
             switch (type)
             {
                 case AddinType.Excel16:
-                    addin = "https://dm-clickonce.prod.cu.edu/Excel2016/ExcelAddin2016DMOPRD.vsto";
+                    return VSTOInstall("https://dm-clickonce.prod.cu.edu/Excel2016/ExcelAddin2016DMOPRD.vsto");
                     break;
                 case AddinType.Outlook16:
-                    addin = "https://dm-clickonce.prod.cu.edu/Outlook2016/OutlookIntegration2016DMOPRD.vsto";
+                    return VSTOInstall("https://dm-clickonce.prod.cu.edu/Outlook2016/OutlookIntegration2016DMOPRD.vsto");
                     break;
                 case AddinType.Word16:
-                    addin = "https://dm-clickonce.prod.cu.edu/Word2016/WordAddin2016DMOPRD.vsto";
+                    return VSTOInstall("https://dm-clickonce.prod.cu.edu/Word2016/WordAddin2016DMOPRD.vsto");
                     break;
             }
 
-            if (!String.IsNullOrEmpty(addin))
-            {
-                ProcessStartInfo proc = new ProcessStartInfo();
-                proc.FileName = @"C:\Program Files\Internet Explorer\iexplore.exe";
-                // Hidden seems to be irrelevant, not really worried about it right now
-                proc.Arguments = addin;
-                proc.CreateNoWindow = true;
-                proc.WindowStyle = ProcessWindowStyle.Hidden;
-                Process.Start(proc);
-            }
+            return 991;
         }
 
-        private void WaitForUI()
+        private bool CertMissing()
         {
-            while (true)
+            bool missing = true;
+            X509Store certs = new X509Store(StoreName.TrustedPublisher,StoreLocation.CurrentUser);
+            certs.Open(OpenFlags.ReadOnly);
+            for (int i = 0; i < certs.Certificates.Count; i++)
             {
-                try
+                if (certs.Certificates[i].GetNameInfo(X509NameType.SimpleName,false) == "University of Colorado. at Boulder - Custom Requests")
                 {
-                    Debug.WriteLine(Process.GetProcessesByName("VSTOInstaller")[1].MainWindowTitle);
-                    if (Process.GetProcessesByName("VSTOInstaller")[0].MainWindowTitle ==
-                        "Microsoft Office Customization Installer")
-                    {
-                        break;
-                    }
+                    missing = false;
                 }
-                catch
-                {
-                    // Junk who cares
-                }
-                Thread.Sleep(300);
             }
+            certs.Close();
+            certs = null;
+            return missing;
         }
 
-        private void SendConfirmationKeys()
+        private void InstallCert()
         {
-            const int WM_SYSKEYDOWN = 0x0104;
-            const int VK_RETURN = 0x0D;
-            const int VK_TAB = 0x09;
-
-            var p = Process.GetProcessesByName("dfsvc");
-            for (var x = 0; x < p.Length; x++)
-            {
-                IntPtr WindowToFind = p[x].MainWindowHandle;
-                PostMessage(WindowToFind, WM_SYSKEYDOWN, VK_TAB, 0);
-                PostMessage(WindowToFind, WM_SYSKEYDOWN, VK_TAB, 0);
-                PostMessage(WindowToFind, WM_SYSKEYDOWN, VK_TAB, 0);
-                PostMessage(WindowToFind, WM_SYSKEYDOWN, VK_RETURN, 0);
-            }
+            X509Certificate2 cert = new X509Certificate2();
+            cert.Import(Resources.UCB);
+            X509Store certs = new X509Store(StoreName.TrustedPublisher, StoreLocation.CurrentUser);
+            certs.Open(OpenFlags.ReadWrite);
+            certs.Add(cert);
+            certs.Close();
+            cert = null;
+            certs = null;
         }
 
-        private void WaitForCompletion()
+        private int VSTOInstall(string url)
         {
-            while (true)
+            ProcessStartInfo installer = new ProcessStartInfo();
+            installer.Arguments = $"/i \"{url}\" /s";
+            // I should make this dynamic for future versions to iterate and find where VSTO is installed.
+            installer.FileName = "c:\\Program Files\\Common Files\\Microsoft Shared\\VSTO\\10.0\\VSTOInstaller.exe";
+            var status = Process.Start(installer);
+            while (!status.HasExited)
             {
-                Debug.WriteLine(Process.GetProcessesByName("dfsvc")[0].MainWindowTitle);
-                try
-                {
-                    if (Process.GetProcessesByName("dfsvc")[0].MainWindowTitle ==
-                        "Login")
-                    {
-                        break;
-                    }
-                }
-                catch
-                {
-                    // Junk who cares
-                }
-                Thread.Sleep(300);
+                Thread.Sleep(300); // Wait
             }
+            // Exit code 0 is success
+            return status.ExitCode;
         }
+
     }
 }
