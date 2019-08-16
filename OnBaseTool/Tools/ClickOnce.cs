@@ -12,6 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.Win32;
+using OnBaseTool.StaticClasses;
 
 namespace OnBaseTool.Tools
 {
@@ -36,10 +37,23 @@ namespace OnBaseTool.Tools
             clicker.Install();
         }
 
-        public static void OutlookAddinInstall()
+        public static void OutlookAddin()
         {
             Plugins plug = new Plugins();
-            plug.OutlookAddin();
+            plug.OutlookAddin(Settings.ReinstallAddins);
+            plug = null;
+        }
+        public static void ExcelAddin()
+        {
+            Plugins plug = new Plugins();
+            plug.ExcelAddin(Settings.ReinstallAddins);
+            plug = null;
+        }
+        public static void WordAddin()
+        {
+            Plugins plug = new Plugins();
+            plug.WordAddin(Settings.ReinstallAddins);
+            plug = null;
         }
 
 

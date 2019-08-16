@@ -99,6 +99,8 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Enums\WorkType.cs" />
+    <Compile Include="StaticClasses\Settings.cs" />
+    <Compile Include="StaticClasses\WorkStatus.cs" />
     <Compile Include="Tools\ClickOnce.cs" />
     <Compile Include="Tools\ClickOnceInstaller.cs" />
     <Compile Include="Tools\Plugins.cs" />
@@ -132,6 +134,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="favicon_png_dBp_icon.ico" />
+    <None Include="images\favicon_png.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="ThreadStatus\" />

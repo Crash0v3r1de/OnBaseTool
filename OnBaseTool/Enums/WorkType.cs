@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OnBaseTool.ThreadStatus
+namespace OnBaseTool.Enums
 {
     public enum WorkType
     {
@@ -12,6 +12,7 @@ namespace OnBaseTool.ThreadStatus
         Uninstalling=1,
         RemovingFolders=2,
         Installing=3,
-        Completed=4
+        Completed=4,
+        Repair=5,
     }
 }

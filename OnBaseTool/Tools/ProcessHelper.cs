@@ -52,7 +52,14 @@ namespace OnBaseTool.Tools
             {
                 for (int x = 0; x < proc.Length; x++)
                 {
-                    proc[x].Kill();
+                    try
+                    {
+                        proc[x].Kill();
+                    }
+                    catch
+                    {
+                        // This and the client is ran at user level so if this catches that's just weird
+                    }
                 }
             }
         }
