@@ -23,18 +23,22 @@ namespace OnBaseTool.Tools
 
         private static bool noUninstaller = false;
         
-        public static void UnitySimpleUninstall()
+        public static void UnitySimpleUninstall(bool uninstallOnly = false)
         {
+            WorkStatus.UnityUninstall();
             KillIfRunning();
             StartUninstall();
             WaitForUI();
             SendConfirmationKeys();
+            if(!uninstallOnly) WorkStatus.UnityUninstallDone();
         }
 
         public static void UnityInstall()
         {
+            WorkStatus.UnityStarted();
             ClickOnceInstaller clicker = new ClickOnceInstaller();
             clicker.Install();
+            WorkStatus.UnityInstalled();
         }
 
         public static void OutlookAddin()
@@ -42,18 +46,21 @@ namespace OnBaseTool.Tools
             Plugins plug = new Plugins();
             plug.OutlookAddin(Settings.ReinstallAddins);
             plug = null;
+            WorkStatus.AddinCompleted();
         }
         public static void ExcelAddin()
         {
             Plugins plug = new Plugins();
             plug.ExcelAddin(Settings.ReinstallAddins);
             plug = null;
+            WorkStatus.AddinCompleted();
         }
         public static void WordAddin()
         {
             Plugins plug = new Plugins();
             plug.WordAddin(Settings.ReinstallAddins);
             plug = null;
+            WorkStatus.AddinCompleted();
         }
 
 

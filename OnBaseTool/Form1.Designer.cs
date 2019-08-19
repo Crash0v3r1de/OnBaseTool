@@ -40,12 +40,13 @@ namespace OnBaseTool
             this.button6 = new System.Windows.Forms.Button();
             this.chkCloseAfter = new System.Windows.Forms.CheckBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.lblWait = new System.Windows.Forms.Label();
             this.button10 = new System.Windows.Forms.Button();
             this.button9 = new System.Windows.Forms.Button();
             this.button8 = new System.Windows.Forms.Button();
             this.chkRepair = new System.Windows.Forms.CheckBox();
             this.button7 = new System.Windows.Forms.Button();
-            this.lblWait = new System.Windows.Forms.Label();
+            this.prgWait = new System.Windows.Forms.ProgressBar();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
@@ -138,6 +139,7 @@ namespace OnBaseTool
             // groupBox1
             // 
             this.groupBox1.Controls.Add(this.lblWait);
+            this.groupBox1.Controls.Add(this.prgWait);
             this.groupBox1.Controls.Add(this.button10);
             this.groupBox1.Controls.Add(this.button9);
             this.groupBox1.Controls.Add(this.button8);
@@ -152,6 +154,19 @@ namespace OnBaseTool
             this.groupBox1.TabIndex = 8;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Office Add-ins";
+            // 
+            // lblWait
+            // 
+            this.lblWait.AutoSize = true;
+            this.lblWait.Font = new System.Drawing.Font("HelveticaNeueLT Pro 57 Cn", 21.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblWait.ForeColor = System.Drawing.Color.White;
+            this.lblWait.Location = new System.Drawing.Point(69, 3);
+            this.lblWait.Name = "lblWait";
+            this.lblWait.Size = new System.Drawing.Size(169, 34);
+            this.lblWait.TabIndex = 10;
+            this.lblWait.Text = "Please Wait...";
+            this.lblWait.Visible = false;
+            this.lblWait.Click += new System.EventHandler(this.lblWait_Click);
             // 
             // button10
             // 
@@ -207,18 +222,14 @@ namespace OnBaseTool
             this.button7.UseVisualStyleBackColor = true;
             this.button7.Click += new System.EventHandler(this.button7_Click);
             // 
-            // lblWait
+            // prgWait
             // 
-            this.lblWait.AutoSize = true;
-            this.lblWait.Font = new System.Drawing.Font("HelveticaNeueLT Pro 57 Cn", 21.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblWait.ForeColor = System.Drawing.Color.White;
-            this.lblWait.Location = new System.Drawing.Point(69, 45);
-            this.lblWait.Name = "lblWait";
-            this.lblWait.Size = new System.Drawing.Size(169, 34);
-            this.lblWait.TabIndex = 10;
-            this.lblWait.Text = "Please Wait...";
-            this.lblWait.Visible = false;
-            this.lblWait.Click += new System.EventHandler(this.lblWait_Click);
+            this.prgWait.Location = new System.Drawing.Point(68, 33);
+            this.prgWait.Name = "prgWait";
+            this.prgWait.Size = new System.Drawing.Size(170, 23);
+            this.prgWait.Style = System.Windows.Forms.ProgressBarStyle.Marquee;
+            this.prgWait.TabIndex = 11;
+            this.prgWait.Visible = false;
             // 
             // Form1
             // 
@@ -226,13 +237,13 @@ namespace OnBaseTool
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Black;
             this.ClientSize = new System.Drawing.Size(333, 278);
-            this.Controls.Add(this.button7);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.chkCloseAfter);
             this.Controls.Add(this.button3);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.pictureBox1);
+            this.Controls.Add(this.button7);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
             this.Text = "OnBase Install Tool";
@@ -262,6 +273,7 @@ namespace OnBaseTool
         private System.Windows.Forms.Button button9;
         private System.Windows.Forms.Button button10;
         private Label lblWait;
+        private ProgressBar prgWait;
     }
 }
 

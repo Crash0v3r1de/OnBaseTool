@@ -5,6 +5,7 @@ using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,6 +21,14 @@ namespace OnBaseTool
 {
     public partial class Form1 : Form
     {
+        [DllImport("user32.dll")]
+        public static extern bool EnableWindow(IntPtr hwnd, bool bEnable);
+
+        [DllImport("user32.dll")]
+        public static extern IntPtr GetForeGroundWindow();
+
+        [DllImport("user32.dll")]
+        public static extern IntPtr SetFocus(IntPtr hWnd);
 
         private int Angle;
         private Image Art; // you may need to resample larger images to a smaller image dynamically!
@@ -43,16 +52,15 @@ namespace OnBaseTool
 
         private void button1_Click(object sender, EventArgs e)
         {
-            UpdateStatus(WorkType.Uninstalling);
-            UpdateStatus(WorkType.Installing);
+            WorkStatus.UnityStarted();
             Task.Run(() =>
             {
                 WaitForCompletetion();
             });
             Task.Run(() =>
             {
-                ClickOnce.UnitySimpleUninstall();
-                ClickOnce.UnityInstall();
+                ClickOnce.UnitySimpleUninstall(true);
+                ClickOnce.UnityInstall(); // Status completion happens in this function since threaded
             });
         }
 
@@ -95,25 +103,27 @@ namespace OnBaseTool
 
         private void button2_Click(object sender, EventArgs e)
         {
-            ClickOnce.UnitySimpleUninstall();
-            FolderHelper foldz = new FolderHelper();
-            foldz.Remove2_0Folder();
-            ClickOnce.UnityInstall();
-            if (chkCloseAfter.Checked)
+            WorkStatus.RepairStarted();
+            Task.Run(() => { WaitForCompletetion();});
+            Task.Run(() =>
             {
-                Environment.Exit(0);
-            }
+                ClickOnce.UnitySimpleUninstall(true);
+                FolderHelper foldz = new FolderHelper();
+                foldz.Remove2_0Folder();
+                ClickOnce.UnityInstall();
+            });
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
             chkCloseAfter.ForeColor = Color.FromArgb(207, 184, 124, 1);
             lblWait.ForeColor = Color.FromArgb(207, 184, 124, 1);
+            chkRepair.ForeColor = Color.FromArgb(207, 184, 124, 1);
         }
 
         private void button4_Click(object sender, EventArgs e)
         {
-            UpdateStatus(WorkType.Installing);
+            WorkStatus.AddinInstalling();
             Task.Run(() =>
             {
                 WaitForCompletetion();
@@ -123,7 +133,7 @@ namespace OnBaseTool
 
         private void button5_Click(object sender, EventArgs e)
         {
-            UpdateStatus(WorkType.Installing);
+            WorkStatus.AddinInstalling();
             Task.Run(() =>
             {
                 WaitForCompletetion();
@@ -133,7 +143,7 @@ namespace OnBaseTool
 
         private void button6_Click(object sender, EventArgs e)
         {
-            UpdateStatus(WorkType.Installing);
+            WorkStatus.AddinInstalling();
             Task.Run(() =>
             {
                 WaitForCompletetion();
@@ -148,7 +158,7 @@ namespace OnBaseTool
 
         private void button7_Click(object sender, EventArgs e)
         {
-            UpdateStatus(WorkType.Uninstalling);
+            WorkStatus.UnityUninstall();
             Task.Run(() =>
             {
                 WaitForCompletetion();
@@ -158,7 +168,7 @@ namespace OnBaseTool
 
         private void button8_Click(object sender, EventArgs e)
         {
-            UpdateStatus(WorkType.Uninstalling);
+            WorkStatus.AddinUninstaling();
             Settings.UninstallAddin = true;
             Task.Run(() =>
             {
@@ -169,7 +179,7 @@ namespace OnBaseTool
 
         private void button9_Click(object sender, EventArgs e)
         {
-            UpdateStatus(WorkType.Uninstalling);
+            WorkStatus.AddinUninstaling();
             Settings.UninstallAddin = true;
             Task.Run(() =>
             {
@@ -180,7 +190,7 @@ namespace OnBaseTool
 
         private void button10_Click(object sender, EventArgs e)
         {
-            UpdateStatus(WorkType.Uninstalling);
+            WorkStatus.AddinUninstaling();
             Settings.UninstallAddin = true;
             Task.Run(() =>
             {
@@ -191,17 +201,68 @@ namespace OnBaseTool
 
         private void WaitForCompletetion()
         {
-            lblWait.Visible = true;
-            while (!WorkStatus.AddinDone || !WorkStatus.RepairDone || !WorkStatus.UnityDone)
+            Debug.WriteLine("Starting wait label...");
+            ShowWait();
+            int setOnce = 0;
+            while (!WorkStatus.AllDone)
             {
-                Thread.Sleep(300);
+                // This function is not a major thing at the moment
+                // Just want to use WinAPI to bring out tool UI in focus when the ClickOnce UI comes up
+                // It by default minimizes our UI
+                try
+                {
+                    IntPtr active = GetForeGroundWindow();
+                    if (active != Handle & setOnce == 0)
+                    {
+                        setOnce = 1;
+                        Debug.WriteLine("Bringing forward once..");
+                        SetFocus(Handle);
+                    }
+                }
+                catch
+                {
+                }
+
+                if (WorkStatus.AllDone) break;
+                Thread.Sleep(600);
             }
 
-            lblWait.Visible = false;
+            Debug.WriteLine("Apparently it's done...");
+            HideWait();
             if (chkCloseAfter.Checked)
             {
+                Debug.WriteLine("Done...");
                 Environment.Exit(0);
+            }else Debug.WriteLine("Wait thread is complete...");
+        }
+
+        private void ShowWait()
+        {
+            if (InvokeRequired)
+            {
+                Invoke(new Action(ShowWait));
+                return;
             }
+
+            prgWait.Enabled = true;
+            prgWait.Visible = true;
+            prgWait.Step = 10;
+            EnableWindow(Handle, false);
+            lblWait.Visible = true;
+        }
+
+        private void HideWait()
+        {
+            if (InvokeRequired)
+            {
+                Invoke(new Action(HideWait));
+                return;
+            }
+
+            prgWait.Enabled = false;
+            prgWait.Visible = false;
+            EnableWindow(Handle, true);
+            lblWait.Visible = false;
         }
 
         private void lblWait_Click(object sender, EventArgs e)

@@ -17,11 +17,17 @@ namespace OnBaseTool.Tools
 
         public bool Install()
         {
+            Debug.WriteLine("Loading UI..");
             LoadAppManifest();
-            WaitForUI();
-            SendConfirmationKeys();
+            Debug.WriteLine("Waiting for UI..");
+            if (!WaitForUI()) // false means we need to send keys
+            {
+                Debug.WriteLine("Sending keys..");
+                SendConfirmationKeys();
+            }
+            Debug.WriteLine("Now we wait...");
             WaitForCompletion();
-
+            Debug.WriteLine("Install is done, login now...");
             return false;
         }
 
@@ -35,12 +41,18 @@ namespace OnBaseTool.Tools
             Process.Start(proc);
         }
 
-        private void WaitForUI()
+        private bool WaitForUI()
         {
-            while (true)
+            bool autoInstall = false;
+            while (true&!autoInstall)
             {
                 try
                 {
+                    if (Process.GetProcessesByName("dfsvc")[0].MainWindowTitle.Contains("Installing"))
+                    {
+                        autoInstall = true; // if cert is installed it directly installs
+                    }
+
                     if (Process.GetProcessesByName("dfsvc")[0].MainWindowTitle ==
                         "Application Install - Security Warning")
                     {
@@ -53,6 +65,8 @@ namespace OnBaseTool.Tools
                 }
                 Thread.Sleep(300);
             }
+
+            return autoInstall;
         }
 
         private void SendConfirmationKeys()
@@ -61,35 +75,41 @@ namespace OnBaseTool.Tools
             const int VK_RETURN = 0x0D;
             const int VK_TAB = 0x09;
 
-            var p = Process.GetProcessesByName("dfsvc");
-            for (var x = 0; x < p.Length; x++)
-            {
-                IntPtr WindowToFind = p[x].MainWindowHandle;
-                PostMessage(WindowToFind, WM_SYSKEYDOWN, VK_TAB, 0);
-                PostMessage(WindowToFind, WM_SYSKEYDOWN, VK_TAB, 0);
-                PostMessage(WindowToFind, WM_SYSKEYDOWN, VK_TAB, 0);
-                PostMessage(WindowToFind, WM_SYSKEYDOWN, VK_RETURN, 0);
-            }
+                var p = Process.GetProcessesByName("dfsvc");
+                for (var x = 0; x < p.Length; x++)
+                {
+                    IntPtr WindowToFind = p[x].MainWindowHandle;
+                    PostMessage(WindowToFind, WM_SYSKEYDOWN, VK_TAB, 0);
+                    PostMessage(WindowToFind, WM_SYSKEYDOWN, VK_TAB, 0);
+                    PostMessage(WindowToFind, WM_SYSKEYDOWN, VK_TAB, 0);
+                    PostMessage(WindowToFind, WM_SYSKEYDOWN, VK_RETURN, 0);
+                }
         }
 
         private void WaitForCompletion()
         {
-            while (true)
+            bool done = false;
+            Debug.WriteLine("Wait initiated...");
+            while (!done)
             {
+                int count = 0;
                 try
                 {
-                    if (Process.GetProcessesByName("obunity")[0].MainWindowTitle ==
-                        "Login" & Process.GetProcessesByName("obunity").Length != 0)
-                    {
-                        break;
-                    }
+                    count = Process.GetProcessesByName("obunity").Length;
+                    Debug.WriteLine("length: "+count);
                 }
-                catch
+                catch(Exception ex)
                 {
                     // Junk who cares
                 }
+                if (count != 0)
+                {
+                    done = true;
+                    break;
+                }
                 Thread.Sleep(300);
             }
+            Debug.WriteLine("loop done");
         }
     }
 }
