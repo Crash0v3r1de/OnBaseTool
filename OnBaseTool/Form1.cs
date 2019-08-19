@@ -269,5 +269,17 @@ namespace OnBaseTool
         {
 
         }
+
+        private void button11_Click(object sender, EventArgs e)
+        {
+            RuntimeHelper runtime = new RuntimeHelper();
+            runtime.InstallAddinRuntime();
+        }
+
+        private void button12_Click(object sender, EventArgs e)
+        {
+            RuntimeHelper runtime = new RuntimeHelper();
+            runtime.InstallVirtuePrintD();
+        }
     }
 }

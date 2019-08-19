@@ -41,12 +41,14 @@ namespace OnBaseTool
             this.chkCloseAfter = new System.Windows.Forms.CheckBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.lblWait = new System.Windows.Forms.Label();
+            this.prgWait = new System.Windows.Forms.ProgressBar();
             this.button10 = new System.Windows.Forms.Button();
             this.button9 = new System.Windows.Forms.Button();
             this.button8 = new System.Windows.Forms.Button();
             this.chkRepair = new System.Windows.Forms.CheckBox();
             this.button7 = new System.Windows.Forms.Button();
-            this.prgWait = new System.Windows.Forms.ProgressBar();
+            this.button11 = new System.Windows.Forms.Button();
+            this.button12 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
@@ -168,6 +170,15 @@ namespace OnBaseTool
             this.lblWait.Visible = false;
             this.lblWait.Click += new System.EventHandler(this.lblWait_Click);
             // 
+            // prgWait
+            // 
+            this.prgWait.Location = new System.Drawing.Point(68, 33);
+            this.prgWait.Name = "prgWait";
+            this.prgWait.Size = new System.Drawing.Size(170, 23);
+            this.prgWait.Style = System.Windows.Forms.ProgressBarStyle.Marquee;
+            this.prgWait.TabIndex = 11;
+            this.prgWait.Visible = false;
+            // 
             // button10
             // 
             this.button10.ForeColor = System.Drawing.Color.Black;
@@ -214,7 +225,7 @@ namespace OnBaseTool
             // 
             // button7
             // 
-            this.button7.Location = new System.Drawing.Point(30, 67);
+            this.button7.Location = new System.Drawing.Point(18, 67);
             this.button7.Name = "button7";
             this.button7.Size = new System.Drawing.Size(87, 23);
             this.button7.TabIndex = 9;
@@ -222,14 +233,25 @@ namespace OnBaseTool
             this.button7.UseVisualStyleBackColor = true;
             this.button7.Click += new System.EventHandler(this.button7_Click);
             // 
-            // prgWait
+            // button11
             // 
-            this.prgWait.Location = new System.Drawing.Point(68, 33);
-            this.prgWait.Name = "prgWait";
-            this.prgWait.Size = new System.Drawing.Size(170, 23);
-            this.prgWait.Style = System.Windows.Forms.ProgressBarStyle.Marquee;
-            this.prgWait.TabIndex = 11;
-            this.prgWait.Visible = false;
+            this.button11.Location = new System.Drawing.Point(111, 67);
+            this.button11.Name = "button11";
+            this.button11.Size = new System.Drawing.Size(121, 23);
+            this.button11.TabIndex = 10;
+            this.button11.Text = "Addin Runtime Install";
+            this.button11.UseVisualStyleBackColor = true;
+            this.button11.Click += new System.EventHandler(this.button11_Click);
+            // 
+            // button12
+            // 
+            this.button12.Location = new System.Drawing.Point(238, 68);
+            this.button12.Name = "button12";
+            this.button12.Size = new System.Drawing.Size(75, 23);
+            this.button12.TabIndex = 11;
+            this.button12.Text = "Virtual Print";
+            this.button12.UseVisualStyleBackColor = true;
+            this.button12.Click += new System.EventHandler(this.button12_Click);
             // 
             // Form1
             // 
@@ -237,6 +259,8 @@ namespace OnBaseTool
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Black;
             this.ClientSize = new System.Drawing.Size(333, 278);
+            this.Controls.Add(this.button12);
+            this.Controls.Add(this.button11);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.chkCloseAfter);
             this.Controls.Add(this.button3);
@@ -274,6 +298,8 @@ namespace OnBaseTool
         private System.Windows.Forms.Button button10;
         private Label lblWait;
         private ProgressBar prgWait;
+        private Button button11;
+        private Button button12;
     }
 }
 
